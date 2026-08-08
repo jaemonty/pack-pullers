@@ -1,0 +1,19 @@
+[
+  {
+    "id": "the-hobbit-collector",
+    "name": "The Hobbit",
+    "type": "Collector Booster",
+    "year": "2026",
+    "image": "assets/hobbit-collector-booster-blue.png",
+    "enabled": true
+  },
+  {
+    "id": "marvel-super-heroes-collector",
+    "name": "Marvel Super Heroes",
+    "type": "Collector Booster",
+    "year": "2026",
+    "image": "assets/marvel-super-heroes-collector.png",
+    "enabled": false,
+    "imageTreatment": "blue-shift"
+  }
+]

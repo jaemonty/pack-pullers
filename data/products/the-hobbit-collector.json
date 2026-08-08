@@ -1,0 +1,26 @@
+{
+  "id": "the-hobbit-collector",
+  "name": "Magic: The Gathering | The Hobbit",
+  "boosterType": "Collector Booster",
+  "setCodes": ["HOB", "HOC"],
+  "releaseDate": "2026-08-14",
+  "verifiedAt": "2026-08-07",
+  "officialSource": "https://magic.wizards.com/en/news/feature/collecting-the-hobbit",
+  "notes": "Box Topper cards are not included because they are packaged with booster boxes, not inside individual Collector Boosters.",
+  "eligibility": [
+    { "set": "HOB", "from": 1, "to": 188, "treatment": "Default frame", "finishRule": "foil-only" },
+    { "set": "HOB", "from": 194, "to": 198, "treatment": "Middle-earth journey land", "finishRule": "foil-only" },
+    { "set": "HOB", "from": 199, "to": 213, "treatment": "Scene", "finishRule": "scene-by-rarity" },
+    { "set": "HOB", "from": 214, "to": 238, "treatment": "Dragon hoard", "finishRule": "booster-fun-by-rarity" },
+    { "set": "HOB", "from": 239, "to": 248, "treatment": "Book cover", "finishRule": "nonfoil-and-foil" },
+    { "set": "HOB", "from": 249, "to": 249, "treatment": "Gleaming Gold headliner", "finishRule": "foil-only" },
+    { "set": "HOB", "from": 250, "to": 274, "treatment": "Dragon hoard — Surge foil", "finishRule": "foil-only" },
+    { "set": "HOB", "from": 275, "to": 284, "treatment": "Book cover — Surge foil", "finishRule": "foil-only" },
+    { "set": "HOB", "from": 285, "to": 312, "treatment": "Extended art", "finishRule": "nonfoil-and-foil" },
+    { "set": "HOC", "from": 1, "to": 12, "treatment": "Scene", "finishRule": "nonfoil-only" },
+    { "set": "HOC", "from": 13, "to": 52, "treatment": "Middle-earth classic artist", "finishRule": "nonfoil-only" },
+    { "set": "HOC", "from": 53, "to": 92, "treatment": "Middle-earth classic artist — Surge foil", "finishRule": "foil-only" },
+    { "set": "HOC", "from": 93, "to": 97, "treatment": "Dwarvish language", "finishRule": "nonfoil-and-foil" },
+    { "set": "HOC", "from": 98, "to": 106, "treatment": "Extended art", "finishRule": "nonfoil-only" }
+  ]
+}
