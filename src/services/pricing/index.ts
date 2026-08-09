@@ -1,4 +1,3 @@
-
 import { readPriceCache, writePriceCache } from "./cache";
 import { MTGMatePricingProvider } from "./mtgMatePricing";
 import type { PriceMap, PricingCard, PricingProvider, PricingSnapshot } from "./pricingProvider";
@@ -68,4 +67,3 @@ export function loadPricing(
   });
   return () => { active = false; };
 }
-

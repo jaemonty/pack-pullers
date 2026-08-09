@@ -1,4 +1,3 @@
-
 import type { PriceMap, PricingCard, PricingProvider } from "./pricingProvider";
 
 /**
@@ -18,4 +17,3 @@ export class MTGMatePricingProvider implements PricingProvider {
     throw new Error("MTG Mate pricing requires an approved API or data feed.");
   }
 }
-

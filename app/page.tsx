@@ -1,10 +1,13 @@
-
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { enabledPricingProviders, formatPrice, getPricingProvider, loadPricing, type PricingSnapshot } from "../src/services/pricing";
 
-type Product = { id: string; name: string; type: string; year: string; image: string; enabled: boolean; imageTreatment?: string };
+type Product = {
+  id: string; name: string; type: string; year: string; shortCode: string;
+  image: string | null; enabled: boolean; imageTreatment?: string;
+  artStatus: "final" | "temporary" | "needed"; dataStatus: "ready" | "needed";
+};
 type Finish = "nonfoil" | "foil";
 type Card = {
   id: string; oracleId: string; name: string; fullName: string; set: string; setName: string;
@@ -112,70 +115,76 @@ export default function Home() {
 
   const changeViewMode = (mode: "list" | "grid") => { setViewMode(mode); localStorage.setItem("pack-pullers-view", mode); };
   const clearFilters = () => { setQuery(""); setRarity("all"); setTreatment("all"); setFinish("all"); };
-  const aud = (price: number | null) => price != null && audRate ? `â‰ˆ ${formatPrice(price * audRate, "AUD")} converted` : "AUD conversion unavailable";
-  const pricingMeta = pricing ? `${selectedProvider.displayName} â€¢ ${pricing.status === "fresh" ? "updated" : pricing.status === "snapshot" ? "included snapshot" : pricing.status === "error" ? "refresh unavailable" : "cached"} ${elapsedLabel(pricing.fetchedAt)}` : `${selectedProvider.displayName} â€¢ loading prices`;
+  const aud = (price: number | null) => price != null && audRate ? `≈ ${formatPrice(price * audRate, "AUD")} converted` : "AUD conversion unavailable";
+  const pricingMeta = pricing ? `${selectedProvider.displayName} • ${pricing.status === "fresh" ? "updated" : pricing.status === "snapshot" ? "included snapshot" : pricing.status === "error" ? "refresh unavailable" : "cached"} ${elapsedLabel(pricing.fetchedAt)}` : `${selectedProvider.displayName} • loading prices`;
 
   if (view === "database") {
     return <main className="databasePage">
+      <nav className="scrollControls" aria-label="Page navigation">
+        <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Go to top of page"><span aria-hidden="true">↑</span><small>TOP</small></button>
+        <button type="button" onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })} aria-label="Go to bottom of page"><small>BOTTOM</small><span aria-hidden="true">↓</span></button>
+      </nav>
       <header className="databaseHero">
         <div className="referenceCloud referenceCloudOne" /><div className="referenceCloud referenceCloudTwo" />
-        <button className="backButton" type="button" onClick={() => setView("machine")}>â† VENDING MACHINE</button>
+        <button className="backButton" type="button" onClick={() => setView("machine")}>← VENDING MACHINE</button>
         <div className="databasePack"><img src="assets/hobbit-collector-booster-blue.png" alt="The Hobbit Collector Booster" /></div>
         <div className="databaseHeading">
           <p>PACK PULLER DATABASE</p><h1>THE HOBBIT</h1><h2>Collector Booster</h2>
-          <div className="databaseStats"><span><b>{data?.printingCount || "â€”"}</b> eligible printings</span><span><b>15</b> cards per pack</span><span><b>{audRate ? audRate.toFixed(2) : "â€”"}</b> USD â†’ AUD</span></div>
+          <div className="databaseStats"><span><b>{data?.printingCount || "—"}</b> eligible printings</span><span><b>15</b> cards per pack</span><span><b>{audRate ? audRate.toFixed(2) : "—"}</b> USD → AUD</span></div>
         </div>
       </header>
 
-      {loading ? <div className="databaseLoading"><i /><p>Consulting the archivesâ€¦</p></div> : data && <div className="databaseShell">
+      {loading ? <div className="databaseLoading"><i /><p>Consulting the archives…</p></div> : data && <div className="databaseShell">
         <section className="chaseSection" aria-labelledby="chase-title">
           <div className="sectionTitle"><p>THE TREASURE HOARD</p><h2 id="chase-title">CHASE CARDS</h2><span>Highest priced eligible printing + finish</span></div>
           <div className="chaseGrid">{chaseCards.map(({ card, finish: cardFinish, price, headliner }, index) => <button className={`chaseCard chase${index + 1}`} key={`${card.id}-${cardFinish}`} onClick={() => setSelectedCard(card)}>
-            <b className="rank">#{index + 1}</b>{headliner && <b className="headlinerBadge">â‰ˆ500 MADE</b>}<img src={card.image || "assets/card-back.svg"} alt={card.name} /><div><strong>{card.name}</strong><span>{card.treatment} Â· {finishLabel(cardFinish)}</span><em>{headliner ? "ULTRA-RARE HEADLINER" : formatPrice(price, pricing?.currency || selectedProvider.currency)}</em><small>{price != null ? aud(price) : "Market price not yet available"}</small></div>
+            <b className="rank">#{index + 1}</b>{headliner && <b className="headlinerBadge">≈500 MADE</b>}<img src={card.image || "assets/card-back.svg"} alt={card.name} /><div><strong>{card.name}</strong><span>{card.treatment} · {finishLabel(cardFinish)}</span><em>{headliner ? "ULTRA-RARE HEADLINER" : formatPrice(price, pricing?.currency || selectedProvider.currency)}</em><small>{price != null ? aud(price) : "Market price not yet available"}</small></div>
           </button>)}</div>
         </section>
 
         <section className="pullsSection" aria-labelledby="pulls-title">
           <div className="sectionTitle pullsTitle"><div><p>CHECK YOUR PACK</p><h2 id="pulls-title">ALL POSSIBLE PULLS</h2></div><span>{filteredCards.length} of {data.printingCount} printings</span></div>
           <div className="filterBar">
-            <label className="searchBox"><span>âŒ•</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search card name or collector number" /></label>
+            <label className="searchBox"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search card name or collector number" /></label>
             <select aria-label="Rarity" value={rarity} onChange={(event) => setRarity(event.target.value)}><option value="all">All rarities</option><option value="common">Common</option><option value="uncommon">Uncommon</option><option value="rare">Rare</option><option value="mythic">Mythic</option></select>
             <select aria-label="Treatment" value={treatment} onChange={(event) => setTreatment(event.target.value)}><option value="all">All treatments</option>{treatments.map((item) => <option key={item}>{item}</option>)}</select>
             <select aria-label="Finish" value={finish} onChange={(event) => setFinish(event.target.value)}><option value="all">All finishes</option><option value="nonfoil">Non-foil</option><option value="foil">Foil</option></select>
             <select aria-label="Sort cards" value={sort} onChange={(event) => setSort(event.target.value)}><option value="value-desc">Value: high to low</option><option value="collector">Collector number</option><option value="name">Card name</option></select>
             <button className="clearButton" type="button" onClick={clearFilters}>Clear</button>
           </div>
-          <div className="databaseTools"><label className="pricingSelector"><span>PRICE SOURCE</span><select aria-label="Price source" value={pricingProviderId} onChange={(event) => changePricingProvider(event.target.value)}>{enabledPricingProviders.map((provider) => <option key={provider.id} value={provider.id}>{provider.displayName} Â· {provider.currency}</option>)}</select><small>{pricingMeta}</small></label><div className="viewSwitch"><button className={viewMode === "list" ? "active" : ""} onClick={() => changeViewMode("list")}>â˜· Compact</button><button className={viewMode === "grid" ? "active" : ""} onClick={() => changeViewMode("grid")}>â–¦ Grid</button></div></div>
+          <div className="databaseTools"><label className="pricingSelector"><span>PRICE SOURCE</span><select aria-label="Price source" value={pricingProviderId} onChange={(event) => changePricingProvider(event.target.value)}>{enabledPricingProviders.map((provider) => <option key={provider.id} value={provider.id}>{provider.displayName} · {provider.currency}</option>)}</select><small>{pricingMeta}</small></label><div className="viewSwitch"><button className={viewMode === "list" ? "active" : ""} onClick={() => changeViewMode("list")}>☷ Compact</button><button className={viewMode === "grid" ? "active" : ""} onClick={() => changeViewMode("grid")}>▦ Grid</button></div></div>
           <div className={viewMode === "list" ? "cardList" : "cardGrid"}>{filteredCards.map((card) => {
             const prices = card.eligibleFinishes.map((eligibleFinish) => providerPrice(card, eligibleFinish)).filter((price): price is number => price != null);
             const best = prices.length ? Math.max(...prices) : null;
             return <button className="cardEntry" key={card.id} onClick={() => setSelectedCard(card)}>
               <img src={card.smallImage || "assets/card-back.svg"} alt="" loading="lazy" />
-              <div className="cardIdentity"><strong>{card.name}</strong><span>{card.set} #{card.collectorNumber} Â· {rarityLabel(card.rarity)}</span><small>{card.treatment}</small></div>
+              <div className="cardIdentity"><strong>{card.name}</strong><span>{card.set} #{card.collectorNumber} · {rarityLabel(card.rarity)}</span><small>{card.treatment}</small></div>
               <div className="finishTags">{card.eligibleFinishes.map((item) => <span key={item}>{item === "foil" ? "FOIL" : "NON-FOIL"}</span>)}</div>
               <div className="cardPrice"><b>{formatPrice(best, pricing?.currency || selectedProvider.currency)}</b><span>{aud(best)}</span></div>
             </button>;
           })}</div>
           {!filteredCards.length && <div className="emptyState"><b>No cards found</b><span>Try clearing a filter or changing your search.</span></div>}
-          <footer className="dataNote">Eligibility verified against <a href={data.officialSource} target="_blank" rel="noreferrer">Wizardsâ€™ Collector Booster collation</a>. Card data and images from Scryfall. Prices shown from {selectedProvider.displayName} in {pricing?.currency || selectedProvider.currency}; AUD figures are currency conversions, not Australian market prices.</footer>
+          <footer className="dataNote">Eligibility verified against <a href={data.officialSource} target="_blank" rel="noreferrer">Wizards’ Collector Booster collation</a>. Card data and images from Scryfall. Prices shown from {selectedProvider.displayName} in {pricing?.currency || selectedProvider.currency}; AUD figures are currency conversions, not Australian market prices.</footer>
         </section>
       </div>}
 
-      {selectedCard && <section className="cardDialog" role="dialog" aria-modal="true" aria-labelledby="card-dialog-title"><button className="dialogBackdrop" aria-label="Close card details" onClick={() => setSelectedCard(null)} /><div className="cardDialogPanel"><button className="dialogClose" onClick={() => setSelectedCard(null)}>Ã—</button><img src={selectedCard.image || "assets/card-back.svg"} alt={selectedCard.name} /><div><p>{selectedCard.set} #{selectedCard.collectorNumber}</p><h2 id="card-dialog-title">{selectedCard.name}</h2><h3>{selectedCard.typeLine}</h3><div className="detailPills"><span>{rarityLabel(selectedCard.rarity)}</span><span>{selectedCard.treatment}</span>{selectedCard.eligibleFinishes.map((item) => <span key={item}>{finishLabel(item)}</span>)}</div><p className="oracleText">{selectedCard.oracleText}</p><a className="scryfallLink" href={selectedCard.scryfall} target="_blank" rel="noreferrer">VIEW ON SCRYFALL â†—</a></div></div></section>}
+      {selectedCard && <section className="cardDialog" role="dialog" aria-modal="true" aria-labelledby="card-dialog-title"><button className="dialogBackdrop" aria-label="Close card details" onClick={() => setSelectedCard(null)} /><div className="cardDialogPanel"><button className="dialogClose" onClick={() => setSelectedCard(null)}>×</button><img src={selectedCard.image || "assets/card-back.svg"} alt={selectedCard.name} /><div><p>{selectedCard.set} #{selectedCard.collectorNumber}</p><h2 id="card-dialog-title">{selectedCard.name}</h2><h3>{selectedCard.typeLine}</h3><div className="detailPills"><span>{rarityLabel(selectedCard.rarity)}</span><span>{selectedCard.treatment}</span>{selectedCard.eligibleFinishes.map((item) => <span key={item}>{finishLabel(item)}</span>)}</div><p className="oracleText">{selectedCard.oracleText}</p><div className="cardExternalLinks"><a className="scryfallLink" href={selectedCard.scryfall} target="_blank" rel="noreferrer">VIEW ON SCRYFALL ↗</a><a className="mtgMateLink" href={`https://www.mtgmate.com.au/search?q=${encodeURIComponent(selectedCard.name)}`} target="_blank" rel="noreferrer">SEARCH MTG MATE ↗</a></div></div></div></section>}
     </main>;
   }
 
   return <main className="world">
-    <div className="stars" aria-hidden="true" /><div className="cloud cloudOne" aria-hidden="true" /><div className="cloud cloudTwo" aria-hidden="true" /><div className="cloud cloudThree" aria-hidden="true" /><div className="cloud cloudFour" aria-hidden="true" />
-    <section className="hero" aria-labelledby="site-title"><header className="brandPlaque"><span className="brandSpark">âœ¦</span><p>THE CELESTIAL ARCADE</p><h1 id="site-title">PACK<br />PULLERS</h1><div className="brandRibbon">CHOOSE YOUR ADVENTURE</div></header>
+    <div className="stars" aria-hidden="true" />
+    <div className="particleField" aria-hidden="true">{Array.from({ length: 18 }, (_, index) => <i key={index} />)}</div>
+    <div className="skyMist skyMistLeft" aria-hidden="true" /><div className="skyMist skyMistRight" aria-hidden="true" />
+    <div className="cloudFloor" aria-hidden="true"><i /><i /><i /></div>
+    <section className="hero" aria-labelledby="site-title"><header className="brandPlaque"><span className="brandSpark">✦</span><p>THE CELESTIAL ARCADE</p><h1 id="site-title"><span>PACK</span><span>PULLERS</span></h1><div className="brandRibbon">CHOOSE YOUR ADVENTURE</div></header>
       <div className="machine" aria-label="Celestial booster vending machine"><div className="machineTopGlow" /><div className="displayBay"><div className="bayLights"><i /><i /><i /><i /><i /></div><div className="slotRail" />
-        {selectedProduct && <><button className="packArrow packArrowLeft" onClick={() => cycleProduct(-1)} aria-label="Previous booster">â€¹</button><button className={`packButton ${selectedProduct.imageTreatment || ""}`} key={selectedProduct.id} onClick={openDatabase} aria-label={`Choose ${selectedProduct.name} ${selectedProduct.type}`}><span className="packAura" /><img src={selectedProduct.image} alt={`${selectedProduct.name} ${selectedProduct.type} pack`} /></button><button className="packArrow packArrowRight" onClick={() => cycleProduct(1)} aria-label="Next booster">â€º</button></>}
-        <div className="selectorDots" aria-label="Choose a booster">{products.map((product, index) => <button key={product.id} className={index === selectedProductIndex ? "active" : ""} onClick={() => setSelectedProductIndex(index)} aria-label={`Show ${product.name}`}><span /><small>{product.name === "The Hobbit" ? "HOB" : "MSH"}</small></button>)}</div>
-        <div className="bayCaption"><strong>{selectedProduct?.name || "CHOOSE A BOOSTER"}</strong><span>{selectedProduct?.type} Â· {selectedProduct?.year}</span></div></div>
-        <aside className="machinePanel"><div className="panelLabel">SELECT A<br />BOOSTER</div><div className="arcaneButton"><span>âœ¦</span></div><div className="coinSlot"><i /><b /></div><div className="flameMark">â™ </div></aside><button className="chooseButton" disabled={!selectedProduct} onClick={openDatabase}><span>{selectedProduct?.enabled ? "PUSH TO CHOOSE" : "PREVIEW PACK"}</span></button><div className="machineFeet"><i /><i /></div>
+        {selectedProduct && <><button className="packArrow packArrowLeft" onClick={() => cycleProduct(-1)} aria-label="Previous booster">‹</button><button className={`packButton ${selectedProduct.imageTreatment || ""}`} key={selectedProduct.id} onClick={openDatabase} aria-label={`Choose ${selectedProduct.name} ${selectedProduct.type}`}><span className="packAura" />{selectedProduct.image ? <img src={selectedProduct.image} alt={`${selectedProduct.name} ${selectedProduct.type} pack`} /> : <span className="productPlaceholder" aria-hidden="true"><b>{selectedProduct.shortCode}</b><small>PACK ART<br />COMING SOON</small></span>}</button><button className="packArrow packArrowRight" onClick={() => cycleProduct(1)} aria-label="Next booster">›</button></>}
+        <div className="selectorDots" aria-label="Choose a booster">{products.map((product, index) => <button key={product.id} className={index === selectedProductIndex ? "active" : ""} onClick={() => setSelectedProductIndex(index)} aria-label={`Show ${product.name} ${product.type}`}><span /><small>{product.shortCode}</small></button>)}</div>
+        <div className="bayCaption"><strong>{selectedProduct?.name || "CHOOSE A BOOSTER"}</strong><span>{selectedProduct?.type} · {selectedProduct?.year}</span></div></div>
+        <aside className="machinePanel"><div className="panelLabel">SELECT A<br />BOOSTER</div><div className="arcaneButton"><span>✦</span></div><div className="coinSlot"><i /><b /></div><div className="flameMark">♠</div></aside><button className="chooseButton" disabled={!selectedProduct} onClick={openDatabase}><span>{selectedProduct?.enabled ? "PUSH TO CHOOSE" : "PREVIEW PACK"}</span></button><div className="machineFeet"><i /><i /></div>
       </div></section>
     <aside className="instructions"><h2><span /> HOW IT WORKS <span /></h2><ol><li><b>1</b><span>Choose the pack</span></li><li><b>2</b><span>Open it in real life</span></li><li><b>3</b><span>Find your pulls here</span></li><li><b>4</b><span>Mark what you got</span></li></ol></aside><aside className="tip"><small>NEW HERE?</small><strong>Tap the booster to begin</strong></aside>
-    {previewProduct && <section className="packPreviewDialog" role="dialog" aria-modal="true" aria-labelledby="preview-pack-title"><button className="dialogBackdrop" aria-label="Close preview" onClick={() => setPreviewProduct(null)} /><div className="packPreviewPanel"><button className="dialogClose" onClick={() => setPreviewProduct(null)}>Ã—</button><img className={previewProduct.imageTreatment || ""} src={previewProduct.image} alt={`${previewProduct.name} ${previewProduct.type}`} /><div><p>PACK PREVIEW</p><h2 id="preview-pack-title">{previewProduct.name}</h2><h3>{previewProduct.type}</h3><p>Pack switching is ready. The Marvel pull database will be added in a later pass.</p><button onClick={() => setPreviewProduct(null)}>TRY ANOTHER PACK</button></div></div></section>}
+    {previewProduct && <section className="packPreviewDialog" role="dialog" aria-modal="true" aria-labelledby="preview-pack-title"><button className="dialogBackdrop" aria-label="Close preview" onClick={() => setPreviewProduct(null)} /><div className="packPreviewPanel"><button className="dialogClose" onClick={() => setPreviewProduct(null)}>×</button>{previewProduct.image ? <img className={previewProduct.imageTreatment || ""} src={previewProduct.image} alt={`${previewProduct.name} ${previewProduct.type}`} /> : <div className="previewPlaceholder"><b>{previewProduct.shortCode}</b><span>FINAL PACK ART NEEDED</span></div>}<div><p>PACK PREVIEW</p><h2 id="preview-pack-title">{previewProduct.name}</h2><h3>{previewProduct.type}</h3><p>This product is available in the selector. Its final {previewProduct.artStatus === "needed" ? "pack artwork and pull database are" : "pull database is"} still needed before opening can be enabled.</p><button onClick={() => setPreviewProduct(null)}>TRY ANOTHER PACK</button></div></div></section>}
   </main>;
 }
-
