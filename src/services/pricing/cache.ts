@@ -1,4 +1,3 @@
-
 import type { PriceMap, PricingSnapshot } from "./pricingProvider";
 
 export const PRICE_CACHE_TTL = 6 * 60 * 60 * 1000;
@@ -31,4 +30,3 @@ export function writePriceCache(provider: string, currency: string, prices: Pric
   try { localStorage.setItem(storageKey(provider), JSON.stringify(snapshot)); } catch { /* storage is optional */ }
   return snapshot;
 }
-

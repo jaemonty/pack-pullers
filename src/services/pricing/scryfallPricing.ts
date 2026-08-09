@@ -1,4 +1,3 @@
-
 import type { PriceMap, PricingCard, PricingProvider } from "./pricingProvider";
 
 type ScryfallCard = { id: string; prices?: { usd?: string | null; usd_foil?: string | null } };
@@ -37,4 +36,3 @@ export class ScryfallPricingProvider implements PricingProvider {
     return prices;
   }
 }
-

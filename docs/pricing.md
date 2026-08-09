@@ -1,4 +1,3 @@
-
 # Pack Pullers pricing providers
 
 The card browser reads all prices through the shared provider contract in
@@ -21,4 +20,3 @@ that provides:
 Once such a source is available, implement `getPrices`, set `enabled = true`,
 and the existing selector, cache, formatting, sorting, and chase-card ranking
 will consume it without card UI changes.
-

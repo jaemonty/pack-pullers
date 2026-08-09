@@ -1,4 +1,3 @@
-
 export type PricingCard = {
   id: string;
   prices?: { usd: string | null; usdFoil: string | null };
@@ -23,4 +22,3 @@ export type PricingSnapshot = {
   prices: PriceMap;
   status: "fresh" | "cached" | "snapshot" | "loading" | "error";
 };
-

@@ -4,16 +4,66 @@
     "name": "The Hobbit",
     "type": "Collector Booster",
     "year": "2026",
-    "image": "assets/hobbit-collector-booster-blue.png",
-    "enabled": true
+    "shortCode": "HOB-C",
+    "image": "assets/hobbit-collector-booster-original.png",
+    "enabled": true,
+    "artStatus": "final",
+    "dataStatus": "ready"
+  },
+  {
+    "id": "the-hobbit-play",
+    "name": "The Hobbit",
+    "type": "Play Booster",
+    "year": "2026",
+    "shortCode": "HOB-P",
+    "image": null,
+    "enabled": false,
+    "artStatus": "needed",
+    "dataStatus": "needed"
+  },
+  {
+    "id": "the-hobbit-box-topper",
+    "name": "The Hobbit",
+    "type": "Box Topper",
+    "year": "2026",
+    "shortCode": "HOB-BT",
+    "image": null,
+    "enabled": false,
+    "artStatus": "needed",
+    "dataStatus": "needed"
+  },
+  {
+    "id": "tmnt-collector",
+    "name": "Teenage Mutant Ninja Turtles",
+    "type": "Collector Booster",
+    "year": "2026",
+    "shortCode": "TMNT-C",
+    "image": null,
+    "enabled": false,
+    "artStatus": "needed",
+    "dataStatus": "needed"
+  },
+  {
+    "id": "tmnt-play",
+    "name": "Teenage Mutant Ninja Turtles",
+    "type": "Play Booster",
+    "year": "2026",
+    "shortCode": "TMNT-P",
+    "image": null,
+    "enabled": false,
+    "artStatus": "needed",
+    "dataStatus": "needed"
   },
   {
     "id": "marvel-super-heroes-collector",
     "name": "Marvel Super Heroes",
     "type": "Collector Booster",
     "year": "2026",
+    "shortCode": "MSH-C",
     "image": "assets/marvel-super-heroes-collector.png",
     "enabled": false,
+    "artStatus": "temporary",
+    "dataStatus": "needed",
     "imageTreatment": "blue-shift"
   }
 ]
